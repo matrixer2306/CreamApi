@@ -2,6 +2,7 @@
 ---
 # 🙌 Support the Community
 If you would like to support the community and this project, consider making a donation: 
+
 [![Donate](https://img.shields.io/badge/Donate-Click%20Here-orange?style=for-the-badge&logo=paypal)](https://ubd.one/donate)
 ---
 # ⚠️ Disclaimer 
