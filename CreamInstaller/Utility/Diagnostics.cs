@@ -7,77 +7,63 @@ namespace CreamInstaller.Utility;
 
 internal static class Diagnostics
 {
-    private static string notepadPlusPlusPath;
+    private static string nppPath;
 
-    // ANTIVIRUS FALSE POSITIVE WARNING:
-    // Reading registry keys from HKEY_LOCAL_MACHINE to detect installed applications.
-    // This is standard application-detection behavior, not malicious registry enumeration.
-    internal static string NotepadPlusPlusPath
+    private static string NppPath
     {
         get
         {
-            notepadPlusPlusPath ??= Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Notepad++", "", null) as string;
-            notepadPlusPlusPath ??= Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432NODE\Notepad++", "", null) as string;
-            return notepadPlusPlusPath;
+            nppPath ??= Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Notepad++", "", null) as string;
+            nppPath ??= Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432NODE\Notepad++", "", null) as string;
+            return nppPath;
         }
     }
 
     internal static string GetNotepadPath()
     {
-        // Bug fix: NotepadPlusPlusPath may be null; guard before string concatenation.
-        string nppBase = NotepadPlusPlusPath;
-        string npp = nppBase is not null ? nppBase + @"\notepad++.exe" : null;
-        return npp is not null && File.Exists(npp)
-            ? npp
-            : Environment.GetFolderPath(Environment.SpecialFolder.Windows) + @"\notepad.exe";
+        string npp = NppPath is null ? null : NppPath + @"\notepad++.exe";
+        return npp.FileExists() ? npp : Environment.GetFolderPath(Environment.SpecialFolder.Windows) + @"\notepad.exe";
     }
 
     internal static void OpenFileInNotepad(string path)
     {
-        // Bug fix: NotepadPlusPlusPath may be null; guard before string concatenation.
-        string nppBase = NotepadPlusPlusPath;
-        string npp = nppBase is not null ? nppBase + @"\notepad++.exe" : null;
-        if (npp is not null && File.Exists(npp))
+        string npp = NppPath is null ? null : NppPath + @"\notepad++.exe";
+        if (npp.FileExists())
             OpenFileInNotepadPlusPlus(npp, path);
         else
             OpenFileInWindowsNotepad(path);
     }
 
-    // ANTIVIRUS FALSE POSITIVE WARNING:
-    // The following three methods launch external processes (Notepad++, notepad.exe, explorer.exe).
-    // They are invoked only on explicit user request to view a configuration file or directory.
-    // ArgumentList is used instead of the Arguments string to prevent argument-injection vulnerabilities.
-    private static void OpenFileInNotepadPlusPlus(string npp, string path)
+    private static void OpenFileInNotepadPlusPlus(string npp, string path) =>
+        Process.Start(new ProcessStartInfo { FileName = npp, Arguments = path });
+
+    private static void OpenFileInWindowsNotepad(string path) => Process.Start(new ProcessStartInfo
+        { FileName = "notepad.exe", Arguments = path });
+
+    internal static void OpenDirectoryInFileExplorer(string path) => Process.Start(new ProcessStartInfo
+        { FileName = "explorer.exe", Arguments = path });
+
+    internal static void OpenUrlInInternetBrowser(string url) =>
+        Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
+
+    internal static string ResolvePath(this string path)
     {
-        if (!File.Exists(path))
-            return;
-        ProcessStartInfo psi = new() { FileName = npp, UseShellExecute = false };
-        psi.ArgumentList.Add(path);
-        _ = Process.Start(psi);
+        if (path is null || !path.FileExists() && !path.DirectoryExists())
+            return null;
+        DirectoryInfo info = new(path);
+        if (info.Parent is null)
+            return info.Name.ToUpperInvariant();
+        string parent = ResolvePath(info.Parent.FullName);
+        try
+        {
+            FileSystemInfo[] infos = info.Parent.GetFileSystemInfos(info.Name);
+            string name = infos.Length > 0 ? infos[0].Name : info.Name;
+            return parent is null ? name : Path.Combine(parent, name);
+        }
+        catch
+        {
+            // Fall back to the raw name if the filesystem call fails (e.g. on a slow external drive)
+            return parent is null ? info.Name : Path.Combine(parent, info.Name);
+        }
     }
-
-    private static void OpenFileInWindowsNotepad(string path)
-    {
-        if (!File.Exists(path))
-            return;
-        ProcessStartInfo psi = new() { FileName = "notepad.exe", UseShellExecute = false };
-        psi.ArgumentList.Add(path);
-        _ = Process.Start(psi);
-    }
-
-    internal static void OpenDirectoryInFileExplorer(string path)
-    {
-        if (!Directory.Exists(path))
-            return;
-        ProcessStartInfo psi = new() { FileName = "explorer.exe", UseShellExecute = false };
-        psi.ArgumentList.Add(path);
-        _ = Process.Start(psi);
-    }
-
-    // ANTIVIRUS FALSE POSITIVE WARNING:
-    // Opens a URL in the user's default browser via ShellExecute. This is standard behavior
-    // for linking to the project's GitHub page from the Help button — not drive-by download.
-    internal static void OpenUrlInInternetBrowser(string url) => _ = Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
-
-    internal static string BeautifyPath(this string path) => path is null ? null : Path.TrimEndingDirectorySeparator(Path.GetFullPath(path));
 }

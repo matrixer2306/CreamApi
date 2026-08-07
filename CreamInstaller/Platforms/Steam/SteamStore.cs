@@ -1,15 +1,12 @@
 ﻿using System.Collections.Generic;
-using System.IO;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System;
 using CreamInstaller.Utility;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-#if DEBUG
-using System;
-using CreamInstaller.Forms;
-#endif
 
 namespace CreamInstaller.Platforms.Steam;
 
@@ -18,123 +15,141 @@ internal static class SteamStore
     private const int CooldownGame = 600;
     private const int CooldownDlc = 1200;
 
-    internal static async Task<List<string>> ParseDlcAppIds(AppData appData)
+    private static string FormatErrorLog(int attempts, string appId, string gameName, bool isDlc, string reason, 
+        string parentGameName = null, string parentGameAppId = null)
+    {
+        if (isDlc && parentGameName != null && parentGameAppId != null)
+        {
+            return $"[SteamQuery][Attempt {attempts}][FAILED]\n" +
+                   $"BaseGame: \"{parentGameName}\" ({parentGameAppId})\n" +
+                   $"DLC: \"{gameName}\" ({appId})\n" +
+                   $"Type: DLC\n" +
+                   $"Reason: {reason}\n" +
+                   "-------";
+        }
+
+        string type = isDlc ? "DLC" : "Game";
+        return $"[SteamQuery][Attempt {attempts}][FAILED] AppId: {appId} | Name: \"{gameName}\" | Type: {type} | Reason: {reason}";
+    }
+
+    internal static async Task<HashSet<string>> ParseDlcAppIds(StoreAppData storeAppData)
         => await Task.Run(() =>
         {
-            List<string> dlcIds = new();
-            if (appData.dlc is null)
+            HashSet<string> dlcIds = new();
+            if (storeAppData.DLC is null)
                 return dlcIds;
-            dlcIds.AddRange(from appId in appData.dlc where appId > 0 select appId.ToString());
+            foreach (string dlcId in from appId in storeAppData.DLC
+                     where appId > 0
+                     select appId.ToString(CultureInfo.InvariantCulture))
+                _ = dlcIds.Add(dlcId);
             return dlcIds;
         });
 
-    internal static async Task<AppData> QueryStoreAPI(string appId, bool isDlc = false, int attempts = 0)
+    internal static async Task<StoreAppData> QueryStoreAPI(string appId, bool isDlc = false, int attempts = 0, string parentGameName = null, string parentGameAppId = null)
     {
-        while (true)
+        string gameName = "Unknown";
+        while (!Program.Canceled)
         {
-            if (Program.Canceled)
-                return null;
+            attempts++;
             string cacheFile = ProgramData.AppInfoPath + @$"\{appId}.json";
-            bool cachedExists = File.Exists(cacheFile);
+            bool cachedExists = cacheFile.FileExists();
             if (!cachedExists || ProgramData.CheckCooldown(appId, isDlc ? CooldownDlc : CooldownGame))
             {
-                string response = await HttpClientManager.EnsureGet($"https://store.steampowered.com/api/appdetails?appids={appId}");
+                (string response, bool permanentFailure) =
+                    await HttpClientManager.EnsureGet($"https://store.steampowered.com/api/appdetails?appids={appId}");
+                if (permanentFailure)
+                {
+                    ProgramData.Log.Info(
+                        "[SteamAPI] " + FormatErrorLog(attempts, appId, gameName, isDlc, "Permanent failure, aborting retries", parentGameName, parentGameAppId), LogDestination.Steam);
+                    return null;
+                }
                 if (response is not null)
                 {
-                    IDictionary<string, JToken> apps = (IDictionary<string, JToken>)JsonConvert.DeserializeObject(response);
+                    Dictionary<string, JToken> apps =
+                        JsonConvert.DeserializeObject<Dictionary<string, JToken>>(response);
                     if (apps is not null)
                         foreach (KeyValuePair<string, JToken> app in apps)
                             try
                             {
-                                AppDetails appDetails = JsonConvert.DeserializeObject<AppDetails>(app.Value.ToString());
-                                if (appDetails is not null)
+                                StoreAppDetails storeAppDetails =
+                                    JsonConvert.DeserializeObject<StoreAppDetails>(app.Value.ToString());
+                                if (storeAppDetails is not null)
                                 {
-                                    AppData data = appDetails.data;
-                                    if (!appDetails.success)
+                                    StoreAppData data = storeAppDetails.Data;
+                                    if (data?.Name is not null)
+                                        gameName = data.Name;
+
+                                    if (!storeAppDetails.Success)
                                     {
-#if DEBUG
-                                        DebugForm.Current.Log(
-                                            $"Query unsuccessful for appid {appId}{(isDlc ? " (DLC)" : "")}: {app.Value.ToString(Formatting.None)}",
-                                            LogTextBox.Warning);
-#endif
+                                        ProgramData.Log.Info(
+                                            "[SteamAPI] " + FormatErrorLog(attempts, appId, gameName, isDlc, "Query unsuccessful", parentGameName, parentGameAppId), LogDestination.Steam);
                                         if (data is null)
                                             return null;
                                     }
+
                                     if (data is not null)
                                     {
                                         try
                                         {
-                                            await File.WriteAllTextAsync(cacheFile, JsonConvert.SerializeObject(data, Formatting.Indented));
+                                            cacheFile.WriteFile(JsonConvert.SerializeObject(data, Formatting.Indented));
                                         }
-                                        catch
-#if DEBUG
-                                            (Exception e)
+                                        catch (Exception e)
                                         {
-                                            DebugForm.Current.Log(
-                                                $"Unsuccessful serialization of query for appid {appId}{(isDlc ? " (DLC)" : "")}: {e.GetType()} ({e.Message})");
+                                            ProgramData.Log.Info(
+                                                "[SteamAPI] " + FormatErrorLog(attempts, appId, gameName, isDlc, $"Unsuccessful serialization ({e.Message})", parentGameName, parentGameAppId), LogDestination.Steam);
                                         }
-#else
-                                        {
-                                            // ignored
-                                        }
-#endif
                                         return data;
                                     }
-#if DEBUG
-                                    DebugForm.Current.Log(
-                                        $"Response data null for appid {appId}{(isDlc ? " (DLC)" : "")}: {app.Value.ToString(Formatting.None)}");
-#endif
+                                    ProgramData.Log.Info(
+                                        "[SteamAPI] " + FormatErrorLog(attempts, appId, gameName, isDlc, "Response data null", parentGameName, parentGameAppId), LogDestination.Steam);
                                 }
-#if DEBUG
-                                else
-                                    DebugForm.Current.Log(
-                                        $"Response details null for appid {appId}{(isDlc ? " (DLC)" : "")}: {app.Value.ToString(Formatting.None)}");
-#endif
+else
+                                    {
+                                        ProgramData.Log.Info(
+                                            "[SteamAPI] " + FormatErrorLog(attempts, appId, gameName, isDlc, "Response details null", parentGameName, parentGameAppId), LogDestination.Steam);
+                                    }
                             }
-                            catch
-#if DEBUG
-                                (Exception e)
+catch (Exception e)
+                                {
+                                    ProgramData.Log.Info(
+                                        "[SteamAPI] " + FormatErrorLog(attempts, appId, gameName, isDlc, $"Unsuccessful deserialization ({e.Message})", parentGameName, parentGameAppId), LogDestination.Steam);
+                                }
+else
                             {
-                                DebugForm.Current.Log(
-                                    $"Unsuccessful deserialization of query for appid {appId}{(isDlc ? " (DLC)" : "")}: {e.GetType()} ({e.Message})");
+                                ProgramData.Log.Info(
+                                    "[SteamAPI] " + FormatErrorLog(attempts, appId, gameName, isDlc, "Response deserialization null", parentGameName, parentGameAppId), LogDestination.Steam);
                             }
-#else
-                            {
-                                // ignored
-                            }
-#endif
-#if DEBUG
-                    else
-                        DebugForm.Current.Log("Response deserialization null for appid " + appId);
-#endif
                 }
                 else
                 {
-#if DEBUG
-                    DebugForm.Current.Log("Response null for appid " + appId, LogTextBox.Warning);
-#endif
+                    ProgramData.Log.Info(
+                        "[SteamAPI] " + FormatErrorLog(attempts, appId, gameName, isDlc, "Null or empty response", parentGameName, parentGameAppId), LogDestination.Steam);
                 }
             }
+
             if (cachedExists)
                 try
                 {
-                    return JsonConvert.DeserializeObject<AppData>(await File.ReadAllTextAsync(cacheFile));
+                    return JsonConvert.DeserializeObject<StoreAppData>(cacheFile.ReadFile());
                 }
                 catch
                 {
-                    try
-                    {
-                        File.Delete(cacheFile);
-                    }
-                    catch
-                    {
-                        // ignored
-                    }
+                    cacheFile.DeleteFile();
                 }
-            if (isDlc || attempts >= 10)
-                return null;
-            await Task.Delay(1000);
-            attempts = ++attempts;
+
+            if (isDlc)
+                break;
+            if (attempts > 3)
+            {
+                ProgramData.Log.Info(
+                    "[SteamAPI] " + FormatErrorLog(attempts, appId, gameName, isDlc, "Maximum retry attempts exceeded (3)", parentGameName, parentGameAppId), LogDestination.Steam);
+                break;
+            }
+
+            int delayMs = Math.Min(1000 * (int)Math.Pow(2, attempts - 1), 10000);
+            await Task.Delay(delayMs + Random.Shared.Next(0, 1000));
         }
+
+        return null;
     }
 }
