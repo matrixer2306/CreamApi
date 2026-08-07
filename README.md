@@ -1,6 +1,9 @@
 ### CreamInstaller v5.0: Automatic DLC Unlocker Installer & Configuration Generator
 ---
-
+### 🙌 Support the Community
+If you would like to support the community and this project, consider making a donation:  
+[![Donate](https://img.shields.io/badge/Donate-Click%20Here-orange?style=for-the-badge&logo=paypal)](https://ubd.one/donate)
+---
 # ⚠️ Disclaimer 
 ## (Read before installation and Follow Us on Github !)
 
@@ -8,6 +11,9 @@
 > It is shared purely for **educational purposes**, software development testing, and to contribute to the growth of the open-source community.
 
 ---
+
+<img width="955" height="663" alt="image" src="https://github.com/user-attachments/assets/f91c4ee4-6145-4e9e-a638-acbf0ddae052" />
+
 
 ### 🛡️ Antivirus / False Positive Warning
 
@@ -43,11 +49,6 @@ The primary purpose of this project is to:
 ❌ **This software is not intended for production use.**  
 We strongly recommend purchasing and using professionally licensed software for your needs.
 
----
-
-### 🙌 Support the Community
-If you would like to support the community and this project, consider making a donation:  
-[![Donate](https://img.shields.io/badge/Donate-Click%20Here-orange?style=for-the-badge&logo=paypal)](https://ubd.one/donate)
 
 ---
 
