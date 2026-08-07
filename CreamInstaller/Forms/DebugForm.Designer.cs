@@ -31,42 +31,58 @@ partial class DebugForm
     /// </summary>
     private void InitializeComponent()
     {
-            this.debugTextBox = new System.Windows.Forms.RichTextBox();
-            this.SuspendLayout();
-            // 
-            // debugTextBox
-            // 
-            this.debugTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.debugTextBox.Location = new System.Drawing.Point(10, 10);
-            this.debugTextBox.Name = "debugTextBox";
-            this.debugTextBox.ReadOnly = true;
-            this.debugTextBox.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedBoth;
-            this.debugTextBox.Size = new System.Drawing.Size(544, 321);
-            this.debugTextBox.TabIndex = 0;
-            this.debugTextBox.TabStop = false;
-            this.debugTextBox.Text = "";
-            // 
-            // DebugForm
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(564, 341);
-            this.ControlBox = false;
-            this.Controls.Add(this.debugTextBox);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "DebugForm";
-            this.Padding = new System.Windows.Forms.Padding(10);
-            this.ShowIcon = false;
-            this.ShowInTaskbar = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "Debug";
-            this.ResumeLayout(false);
-
+        debugTextBox = new RichTextBox();
+        testGameButton = new Button();
+        SuspendLayout();
+        // 
+        // testGameButton
+        // 
+        testGameButton.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+        testGameButton.AutoSize = true;
+        testGameButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+        testGameButton.Location = new System.Drawing.Point(10, 10);
+        testGameButton.Name = "testGameButton";
+        testGameButton.Padding = new Padding(3, 0, 3, 0);
+        testGameButton.Size = new System.Drawing.Size(540, 25);
+        testGameButton.TabIndex = 1;
+        testGameButton.Text = "Test Game";
+        testGameButton.UseVisualStyleBackColor = true;
+        testGameButton.Click += OnTestGame;
+        // 
+        // debugTextBox
+        // 
+        debugTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+        debugTextBox.Location = new System.Drawing.Point(10, 41);
+        debugTextBox.Name = "debugTextBox";
+        debugTextBox.ReadOnly = true;
+        debugTextBox.ScrollBars = RichTextBoxScrollBars.ForcedBoth;
+        debugTextBox.Size = new System.Drawing.Size(540, 286);
+        debugTextBox.TabIndex = 0;
+        debugTextBox.TabStop = false;
+        debugTextBox.Text = "";
+        // 
+        // DebugForm
+        // 
+        AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+        AutoScaleMode = AutoScaleMode.Font;
+        ClientSize = new System.Drawing.Size(560, 337);
+        ControlBox = false;
+        Controls.Add(testGameButton);
+        Controls.Add(debugTextBox);
+        FormBorderStyle = FormBorderStyle.FixedSingle;
+        MaximizeBox = false;
+        MinimizeBox = false;
+        Name = "DebugForm";
+        Padding = new Padding(10);
+        ShowIcon = false;
+        ShowInTaskbar = false;
+        StartPosition = FormStartPosition.Manual;
+        Text = "Debug";
+        ResumeLayout(false);
     }
 
     #endregion
 
     private RichTextBox debugTextBox;
+    private Button testGameButton;
 }

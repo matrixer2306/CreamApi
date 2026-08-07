@@ -1,10 +1,10 @@
+#nullable enable
+
 using System;
 using System.Diagnostics;
-using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using CreamInstaller.Forms;
 using CreamInstaller.Platforms.Steam;
@@ -14,14 +14,18 @@ namespace CreamInstaller;
 
 internal static class Program
 {
-    internal static readonly string Name = Application.CompanyName;
-    private static readonly string Description = Application.ProductName;
-    internal static readonly string Version = Application.ProductVersion;
+    internal static readonly string Name = Application.CompanyName!;
+    private static readonly string Description = Application.ProductName!;
+
+    internal static readonly string Version = Application.ProductVersion[
+        ..(Application.ProductVersion.IndexOf('+') is var index && index != -1
+            ? index
+            : Application.ProductVersion.Length)];
 
     internal const string RepositoryOwner = "ubden-community";
     internal static readonly string RepositoryName = "CreamApi-CreamInstaller";
     internal static readonly string RepositoryPackage = Name + ".zip";
-
+    internal static readonly string RepositoryExecutable = Name + ".exe";
     internal const string CommunityDiscussions = "https://github.com/ubden/CreamApi-CreamInstaller/discussions";
     internal const string CommunityForum = "https://forum.ubden.com.tr/konu/creaminstaller-auto-dlc-unlocker-installer-config-gen.1602/";
     internal const string AbuseEmail = "abuse@ubden.com";
@@ -29,49 +33,59 @@ internal static class Program
 #if DEBUG
     internal static readonly string ApplicationName = Name + " v" + Version + "-debug: " + Description;
     internal static readonly string ApplicationNameShort = Name + " v" + Version + "-debug";
-    internal static readonly string ApplicationExecutable = Name + "-debug.exe"; // should be the same as in .csproj
 #else
     internal static readonly string ApplicationName = Name + " v" + Version + ": " + Description;
     internal static readonly string ApplicationNameShort = Name + " v" + Version;
-    internal static readonly string ApplicationExecutable = Name + ".exe"; // should be the same as in .csproj
 #endif
 
-    internal static readonly Assembly EntryAssembly = Assembly.GetEntryAssembly();
     private static readonly Process CurrentProcess = Process.GetCurrentProcess();
-    internal static readonly string CurrentProcessFilePath = CurrentProcess.MainModule?.FileName;
+    internal static readonly string CurrentProcessFilePath = CurrentProcess.MainModule?.FileName ?? "";
+    internal static readonly int CurrentProcessId = CurrentProcess.Id;
 
-    internal static bool BlockProtectedGames = true;
-    internal static readonly string[] ProtectedGames = { "PAYDAY 2" };
-    internal static readonly string[] ProtectedGameDirectories = { @"\EasyAntiCheat", @"\BattlEye" };
-    internal static readonly string[] ProtectedGameDirectoryExceptions = Array.Empty<string>();
+    // Settings loaded from ProgramData on startup — persisted across sessions
+    internal static SettingsModel AppSettings { get; private set; } = new();
 
-    internal static bool IsGameBlocked(string name, string directory = null)
+    internal static bool UseSmokeAPI
     {
-        if (!BlockProtectedGames)
-            return false;
-        if (ProtectedGames.Contains(name))
-            return true;
-        if (directory is null || ProtectedGameDirectoryExceptions.Contains(name))
-            return false;
-        return ProtectedGameDirectories.Any(path => Directory.Exists(directory + path));
+        get => AppSettings.UseSmokeAPI;
+        set => AppSettings.UseSmokeAPI = value;
     }
 
-    internal static bool IsProgramRunningDialog(Form form, ProgramSelection selection)
+    internal static bool BlockProtectedGames
     {
-        while (true)
-        {
-            if (selection.AreDllsLocked)
-            {
-                using DialogForm dialogForm = new(form);
-                if (dialogForm.Show(SystemIcons.Error,
-                        $"ERROR: {selection.Name} is currently running!" + "\n\nPlease close the program/game to continue . . . ", "Retry", "Cancel")
-                 == DialogResult.OK)
-                    continue;
-            }
-            else
-                return true;
-            return false;
-        }
+        get => AppSettings.BlockProtectedGames;
+        set => AppSettings.BlockProtectedGames = value;
+    }
+
+    internal static bool DarkModeEnabled
+    {
+        get => AppSettings.DarkModeEnabled;
+        set => AppSettings.DarkModeEnabled = value;
+    }
+
+    internal static bool SortByName
+    {
+        get => AppSettings.SortByName;
+        set => AppSettings.SortByName = value;
+    }
+
+    internal static readonly string[] ProtectedGames = ["PAYDAY 2"];
+    internal static readonly string[] ProtectedGameDirectories = [@"\EasyAntiCheat", @"\BattlEye"];
+    internal static readonly string[] ProtectedGameDirectoryExceptions = [];
+
+    internal static bool IsGameBlocked(string name, string? directory = null)
+        => GetGameBlockedReason(name, directory) is not null;
+
+    internal static string? GetGameBlockedReason(string name, string? directory = null)
+    {
+        if (!BlockProtectedGames) return null;
+        if (ProtectedGames.Contains(name)) return "on protected games list";
+        if (directory is null) return null;
+        if (ProtectedGameDirectoryExceptions.Contains(name)) return null;
+        string? foundAntiCheat = ProtectedGameDirectories.FirstOrDefault(path => (directory + path).DirectoryExists());
+        return foundAntiCheat is not null
+            ? $"{foundAntiCheat[1..]} directory found"
+            : null;
     }
 
     [STAThread]
@@ -80,46 +94,106 @@ internal static class Program
         using Mutex mutex = new(true, Name, out bool createdNew);
         if (createdNew)
         {
-            _ = Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
+            _ = Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.ApplicationExit += OnApplicationExit;
             Application.ThreadException += (_, e) => e.Exception.HandleFatalException();
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
-            AppDomain.CurrentDomain.UnhandledException += (_, e) => (e.ExceptionObject as Exception)?.HandleFatalException();
-            _ = Utility.AppSettings.Current; // Initialize settings on startup
-        retry:
-            try
+            AppDomain.CurrentDomain.UnhandledException +=
+                (_, e) => (e.ExceptionObject as Exception)?.HandleFatalException();
+            bool retry = true;
+            while (retry)
             {
-                HttpClientManager.Setup();
-                using MainForm form = new();
+                try
+                {
+                    HttpClientManager.Setup();
+                    AppSettings = ProgramData.LoadSettings(); // load persisted settings
+                    using UpdateForm form = new();
 #if DEBUG
-                DebugForm.Current.Attach(form);
+                    DebugForm.Current.Attach(form);
 #endif
-                Application.Run(form);
-            }
-            catch (Exception e)
-            {
-                if (e.HandleException())
-                    goto retry;
-                Application.Exit();
-                return;
+                    // Apply initial theme (dark by default)
+                    Utility.ThemeManager.Apply(form);
+                    Application.Run(form);
+                    retry = false;
+                }
+                catch (Exception e)
+                {
+                    retry = e.HandleException();
+                    if (!retry)
+                    {
+                        Application.Exit();
+                        return;
+                    }
+                }
             }
         }
+
         mutex.Close();
     }
 
     internal static bool Canceled;
 
-    internal static async void Cleanup(bool cancel = true)
+    /// <summary>
+    /// Initiates application cleanup asynchronously. Use this when you can await the result.
+    /// </summary>
+    /// <param name="cancel">Whether to set the Canceled flag</param>
+    /// <returns>Task that completes when cleanup is finished</returns>
+    internal static async Task CleanupAsync(bool cancel = true)
     {
-        Canceled = cancel;
+        if (cancel)
+            Canceled = true;
         await SteamCMD.Cleanup();
     }
 
-    private static void OnApplicationExit(object s, EventArgs e)
+    /// <summary>
+    /// Synchronous cleanup wrapper for event handlers and other synchronous contexts.
+    /// Initiates cleanup without blocking but does not wait for completion.
+    /// </summary>
+    /// <param name="cancel">Whether to set the Canceled flag</param>
+    internal static void Cleanup(bool cancel = true)
     {
-        Cleanup();
-        HttpClientManager.Dispose();
+        if (cancel)
+            Canceled = true;
+
+        // Fire and forget - don't block synchronous callers
+        // Any exceptions will be logged but won't crash the app
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await SteamCMD.Cleanup();
+            }
+            catch (Exception ex)
+            {
+                ProgramData.Log.Warn($"Cleanup failed: {ex.Message}");
+            }
+        });
+    }
+
+    private static void OnApplicationExit(object? s, EventArgs e)
+    {
+        Canceled = true;
+
+        // For application exit, we should try to wait briefly for cleanup
+        try
+        {
+            Task cleanupTask = SteamCMD.Cleanup();
+            // Wait up to 5 seconds for graceful cleanup
+            if (!cleanupTask.Wait(TimeSpan.FromSeconds(5)))
+            {
+                ProgramData.Log.Warn("Cleanup timed out during application exit");
+            }
+        }
+        catch (Exception ex)
+        {
+            ProgramData.Log.Warn($"Cleanup exception during exit: {ex.Message}");
+        }
+        finally
+        {
+            ProgramData.SaveSettings(AppSettings);
+            HttpClientManager.Dispose();
+        }
     }
 }
