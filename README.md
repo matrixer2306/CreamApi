@@ -1,7 +1,7 @@
 <!-- ═══════════════════════════ OPENING SCENE ═══════════════════════════ -->
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f0c29,50:302b63,100:ff8a00&height=220&section=header&text=CreamInstaller&fontSize=70&fontColor=ffffff&fontAlignY=38&desc=Automatic%20DLC%20Unlocker%20Installer%20%26%20Configuration%20Generator&descAlignY=60&descSize=17&animation=fadeIn" width="100%" alt="CreamInstaller" />
+
 
 <a href="https://github.com/ubden/CreamApi-CreamInstaller">
   <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&duration=3200&pause=900&color=FF8A00&center=true&vCenter=true&width=640&lines=Scan+your+Steam%2C+Epic+%26+Ubisoft+library.;Pick+the+DLC.+Hit+Generate+and+Install.;One+click+to+install.+One+click+to+revert.;Open+source.+No+obfuscation.+Built+by+the+community." alt="Typing intro" />
