@@ -33,9 +33,19 @@ public class ProgramRelease
 
     public Asset Asset => asset ??= Assets.FirstOrDefault(a => a.Name == Program.RepositoryPackage);
 
-    public Version Version => version ??= new(TagName[1..]);
+    public Version Version => version ??= ParseVersion(TagName);
 
-    public string[] Changes => changes ??= Body.Replace("- ", "").Split("\r\n");
+    public string[] Changes => changes ??= (Body ?? "").Replace("- ", "")
+        .Split(["\r\n", "\n"], StringSplitOptions.RemoveEmptyEntries);
+
+    // Accepts tags like "v5", "v5.0" or "v5.0.2.3"; returns null for tags that aren't versions.
+    private static Version ParseVersion(string tag)
+    {
+        string text = tag?.TrimStart('v', 'V') ?? "";
+        if (!text.Contains('.'))
+            text += ".0";
+        return Version.TryParse(text, out Version parsed) ? parsed : null;
+    }
 }
 
 public class Asset

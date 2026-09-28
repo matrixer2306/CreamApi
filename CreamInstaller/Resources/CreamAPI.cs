@@ -15,6 +15,16 @@ internal static class CreamAPI
 {
     internal static readonly List<string> ProxyDLLs = ["winmm", "winhttp", "version"];
 
+    // CreamAPI binaries are optional at build time (see CreamInstaller.csproj).
+    internal static bool IsAvailable => EmbeddedResources.Contains("CreamAPI.steam_api.dll")
+                                        && EmbeddedResources.Contains("CreamAPI.steam_api64.dll");
+
+    private static void EnsureAvailable()
+    {
+        if (!IsAvailable)
+            throw new CustomMessageException("CreamAPI is not included in this build. Switch the selected unlocker to SmokeAPI.");
+    }
+
     internal static IEnumerable<string> GetCreamApiProxies(this string directory)
         => from proxy in ProxyDLLs select directory + @"\" + proxy + ".dll";
 
@@ -221,6 +231,7 @@ internal static class CreamAPI
         => await Task.Run(() =>
         {
             ProgramData.Log.Info($"[CreamAPI] Installing to directory: {directory} | Game: {selection.Name} ({selection.Id}) | GenerateConfig: {generateConfig}", LogDestination.Unlocker);
+            EnsureAvailable();
             DeleteSmokeApiComponents(directory, installForm);
 
             directory.GetCreamApiComponents(out string api32, out string api32_o, out string api64, out string api64_o,
@@ -296,6 +307,7 @@ internal static class CreamAPI
         => await Task.Run(async () =>
         {
             ProgramData.Log.Info($"[CreamAPI] Proxy install to directory: {directory} | Proxy: {selection.Proxy ?? Selection.DefaultProxy} | Game: {selection.Name} ({selection.Id}) | GenerateConfig: {generateConfig}", LogDestination.Unlocker);
+            EnsureAvailable();
             await Koaloader.Uninstall(directory, selection.RootDirectory, installForm);
 
             string proxy = selection.Proxy ?? Selection.DefaultProxy;

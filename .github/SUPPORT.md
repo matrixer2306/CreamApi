@@ -21,7 +21,7 @@ For questions, troubleshooting, and discussions, please use the community channe
 
 ## 🐛 Bug Reports
 
-If you believe you've found a bug, please open an [Issue](https://github.com/ubden-community/CreamApi-CreamInstaller/issues) using the appropriate template.
+If you believe you've found a bug, please open an [Issue](https://github.com/ubden/CreamApi-CreamInstaller/issues) using the appropriate template.
 
 Before reporting, please:
 - Check if the issue already exists

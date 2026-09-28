@@ -1641,6 +1641,16 @@ internal sealed partial class MainForm : CustomForm
 
     private void OnUseSmokeApiToggleChanged(object sender, EventArgs e)
     {
+        if (!useSmokeApiToggle.Checked && !CreamAPI.IsAvailable)
+        {
+            useSmokeApiToggle.Checked = true;
+            using DialogForm form = new(this);
+            _ = form.Show(SystemIcons.Warning,
+                "CreamAPI is not included in this build, so SmokeAPI will be used instead.",
+                customFormText: "CreamAPI unavailable");
+            return;
+        }
+
         Program.UseSmokeAPI = useSmokeApiToggle.Checked;
         useSmokeApiLabel.Text = useSmokeApiToggle.Checked ? "Selected Unlocker: SmokeAPI" : "Selected Unlocker: CreamAPI";
         ProgramData.SaveSettings(Program.AppSettings);
@@ -1668,6 +1678,8 @@ internal sealed partial class MainForm : CustomForm
         ThemeManager.Apply(this);
         if (useSmokeApiToggle is not null)
         {
+            if (!CreamAPI.IsAvailable)
+                Program.UseSmokeAPI = true;
             useSmokeApiToggle.Checked = Program.UseSmokeAPI;
             useSmokeApiLabel.Text = Program.UseSmokeAPI ? "Selected Unlocker: SmokeAPI" : "Selected Unlocker: CreamAPI";
         }

@@ -38,7 +38,7 @@ body:
     attributes:
       label: Before asking
       options:
-        - label: I have read the [README](https://github.com/ubden-community/CreamApi-CreamInstaller/blob/main/README.md) fully
+        - label: I have read the [README](https://github.com/ubden/CreamApi-CreamInstaller/blob/main/README.md) fully
           required: true
         - label: I have searched existing issues and discussions
           required: true
