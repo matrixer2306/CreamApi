@@ -27,7 +27,7 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore CreamInstaller/CreamInstaller.csproj
 
-      - name: Publish (self-contained single file)
+      - name: Publish (framework-dependent single file)
         run: |
           dotnet publish CreamInstaller/CreamInstaller.csproj `
             -c Release `

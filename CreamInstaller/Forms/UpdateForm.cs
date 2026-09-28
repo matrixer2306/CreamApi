@@ -67,7 +67,7 @@ internal sealed partial class UpdateForm : CustomForm
                     $"https://api.github.com/repos/{Program.RepositoryOwner}/{Program.RepositoryName}/releases");
             if (response is not null)
                 releases = JsonConvert.DeserializeObject<List<ProgramRelease>>(response)
-                    ?.Where(release => !release.Draft && !release.Prerelease && release.Asset is not null).ToList();
+                    ?.Where(release => !release.Draft && !release.Prerelease && release.Asset is not null && release.Version is not null).ToList();
             latestRelease = releases?.FirstOrDefault();
 #if DEBUG
             if (latestRelease?.Version is not { } latestVersion)

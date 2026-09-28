@@ -178,7 +178,7 @@ dotnet publish CreamInstaller/CreamInstaller.csproj -c Release -r win-x64 \
   --self-contained false -p:PublishSingleFile=true -o publish/
 ```
 
-> CreamAPI's `steam_api.dll` / `steam_api64.dll` are **not** distributed in this repository. To embed CreamAPI, place them in `CreamInstaller/Resources/CreamAPI/` before building. Without them the build still succeeds, but the CreamAPI unlocker option is unavailable in that build.
+> CreamAPI's `steam_api.dll` / `steam_api64.dll` are **not** distributed in this repository. To embed CreamAPI, place them in `CreamInstaller/Resources/CreamAPI/` before building. Without them the build still succeeds, but the CreamAPI unlocker option is unavailable in that build. Use a CreamAPI release whose MD5 hashes appear in `ResourceMD5s` in `CreamInstaller/Resources/CreamAPI.cs` (v2.0.0.3 – v5.3.0.0), or add the new hashes there with `Hashing/GetHashes.ps1`. Otherwise the installer won't recognize its own proxy DLLs.
 
 </details>
 
