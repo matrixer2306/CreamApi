@@ -22,7 +22,7 @@ internal static class Program
             ? index
             : Application.ProductVersion.Length)];
 
-    internal const string RepositoryOwner = "ubden-community";
+    internal const string RepositoryOwner = "ubden";
     internal static readonly string RepositoryName = "CreamApi-CreamInstaller";
     internal static readonly string RepositoryPackage = Name + ".zip";
     internal static readonly string RepositoryExecutable = Name + ".exe";

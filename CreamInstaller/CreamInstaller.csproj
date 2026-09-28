@@ -5,7 +5,7 @@
         <UseWindowsForms>True</UseWindowsForms>
         <ApplicationIcon>Resources\ini.ico</ApplicationIcon>
         <Version>5.0.2.3</Version>
-        <Copyright>2024-2026, ubden-community (https://github.com/ubden-community)</Copyright>
+        <Copyright>2024-2026, ubden (https://github.com/ubden)</Copyright>
         <Company>CreamInstaller</Company>
         <Product>Automatic DLC Unlocker Installer &amp; Configuration Generator</Product>
         <StartupObject>CreamInstaller.Program</StartupObject>
@@ -148,8 +148,9 @@
         <EmbeddedResource Include="Resources\UplayR1\uplay_r1_loader64.dll" />
         <EmbeddedResource Include="Resources\UplayR2\upc_r2_loader.dll" />
         <EmbeddedResource Include="Resources\UplayR2\upc_r2_loader64.dll" />
-        <EmbeddedResource Include="Resources\CreamAPI\steam_api.dll" />
-        <EmbeddedResource Include="Resources\CreamAPI\steam_api64.dll" />
+        <!-- CreamAPI binaries are not distributed with the source; embed them only when present. -->
+        <EmbeddedResource Include="Resources\CreamAPI\steam_api.dll" Condition="Exists('Resources\CreamAPI\steam_api.dll')" />
+        <EmbeddedResource Include="Resources\CreamAPI\steam_api64.dll" Condition="Exists('Resources\CreamAPI\steam_api64.dll')" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Gameloop.Vdf" Version="0.6.2" />

@@ -24,7 +24,7 @@ body:
     attributes:
       label: Pre-discussion checklist
       options:
-        - label: I have read the [README](https://github.com/ubden-community/CreamApi-CreamInstaller/blob/main/README.md)
+        - label: I have read the [README](https://github.com/ubden/CreamApi-CreamInstaller/blob/main/README.md)
           required: true
         - label: I have searched existing discussions for similar topics
           required: true

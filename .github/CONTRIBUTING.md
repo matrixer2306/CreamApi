@@ -21,7 +21,7 @@ Thank you for your interest in contributing! This project is open-source and com
 
 ### Build
 ```bash
-git clone https://github.com/ubden-community/CreamApi-CreamInstaller.git
+git clone https://github.com/ubden/CreamApi-CreamInstaller.git
 cd CreamApi-CreamInstaller
 dotnet build CreamInstaller/CreamInstaller.csproj -c Debug
 ```
@@ -31,10 +31,10 @@ dotnet build CreamInstaller/CreamInstaller.csproj -c Debug
 ## 📋 How to Contribute
 
 ### Reporting Bugs
-Use the [Bug Report](.github/ISSUE_TEMPLATE/bug-report.md) template.
+Use the [Bug Report](ISSUE_TEMPLATE/bug-report.md) template.
 
 ### Suggesting Enhancements
-Use the [Enhancement Request](.github/ISSUE_TEMPLATE/enhancement-request.md) template.
+Use the [Enhancement Request](ISSUE_TEMPLATE/enhancement-request.md) template.
 
 ### Pull Requests
 

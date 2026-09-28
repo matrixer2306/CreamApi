@@ -1,128 +1,375 @@
-### CreamInstaller v5.0: Automatic DLC Unlocker Installer & Configuration Generator
+<!-- ═══════════════════════════ OPENING SCENE ═══════════════════════════ -->
+<div align="center">
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f0c29,50:302b63,100:ff8a00&height=220&section=header&text=CreamInstaller&fontSize=70&fontColor=ffffff&fontAlignY=38&desc=Automatic%20DLC%20Unlocker%20Installer%20%26%20Configuration%20Generator&descAlignY=60&descSize=17&animation=fadeIn" width="100%" alt="CreamInstaller" />
+
+<a href="https://github.com/ubden/CreamApi-CreamInstaller">
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&duration=3200&pause=900&color=FF8A00&center=true&vCenter=true&width=640&lines=Scan+your+Steam%2C+Epic+%26+Ubisoft+library.;Pick+the+DLC.+Hit+Generate+and+Install.;One+click+to+install.+One+click+to+revert.;Open+source.+No+obfuscation.+Built+by+the+community." alt="Typing intro" />
+</a>
+
+<br/>
+
+[![Latest Release](https://img.shields.io/github/v/release/ubden/CreamApi-CreamInstaller?style=for-the-badge&logo=github&color=ff8a00&label=release)](https://github.com/ubden/CreamApi-CreamInstaller/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/ubden/CreamApi-CreamInstaller/total?style=for-the-badge&logo=windows&color=302b63)](https://github.com/ubden/CreamApi-CreamInstaller/releases)
+[![Stars](https://img.shields.io/github/stars/ubden/CreamApi-CreamInstaller?style=for-the-badge&logo=starship&color=f5c518)](https://github.com/ubden/CreamApi-CreamInstaller/stargazers)
+[![.NET 9](https://img.shields.io/badge/.NET-9.0-512BD4?style=for-the-badge&logo=dotnet)](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)
+[![License: GPL v3](https://img.shields.io/github/license/ubden/CreamApi-CreamInstaller?style=for-the-badge&color=2ea44f)](LICENSE)
+
+<br/>
+
+<a href="https://github.com/ubden"><img src="https://img.shields.io/github/followers/ubden?label=Follow%20%40ubden&style=for-the-badge&logo=github&color=181717" alt="Follow @ubden on GitHub" /></a>
+&nbsp;
+<a href="https://ubd.one/donate"><img src="https://img.shields.io/badge/Donate-Fuel%20the%20Project-ff5f5f?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Donate" /></a>
+
+<br/><br/>
+
+<img src="https://github.com/user-attachments/assets/f91c4ee4-6145-4e9e-a638-acbf0ddae052" width="820" alt="CreamInstaller main window" />
+
+<sub><i>▲ One window. Every launcher. Every DLC.</i></sub>
+
+</div>
+
+<br/>
+
+> [!CAUTION]
+> **Read the [disclaimer](#-act-v--the-fine-print) before installing.** This project is shared for **educational purposes**, is not affiliated with any organization, and is intended for experienced users only.
+
 ---
-# 🙌 Support the Community
-If you would like to support the community and this project, consider making a donation: 
 
-[![Donate](https://img.shields.io/badge/Donate-Click%20Here-orange?style=for-the-badge&logo=paypal)](https://ubd.one/donate)
+<!-- ═══════════════════════════ TABLE OF CONTENTS ═══════════════════════════ -->
+<div align="center">
+
+### 🎞️ The Reel
+
+[**Act I** · The Premise](#-act-i--the-premise) &nbsp;•&nbsp;
+[**Act II** · The Arsenal](#-act-ii--the-arsenal) &nbsp;•&nbsp;
+[**Act III** · Lights, Camera, Install](#-act-iii--lights-camera-install) &nbsp;•&nbsp;
+[**Act IV** · Behind the Scenes](#-act-iv--behind-the-scenes) &nbsp;•&nbsp;
+[**Act V** · The Fine Print](#-act-v--the-fine-print) &nbsp;•&nbsp;
+[**Credits**](#-end-credits) &nbsp;•&nbsp;
+[**Post-Credits Scene**](#-post-credits-scene--join-the-cast)
+
+</div>
+
 ---
-# ⚠️ Disclaimer 
-## (Read before installation and Follow Us on Github !)
 
-> **This software is an open-source project developed for the community and is not affiliated with any organization or institution.**  
-> It is shared purely for **educational purposes**, software development testing, and to contribute to the growth of the open-source community.
+## 🎬 Act I — The Premise
+
+*Somewhere on your drive sit dozens of games, spread across Steam, Epic and Ubisoft Connect, each with its own DLL layout and its own DLC list.*
+
+**CreamInstaller** finds every installed Steam, Epic (including **Heroic**) and Ubisoft game on your computer, along with each game's DLC-related DLL locations. It then queries **SteamCMD**, the **Steam Store** and the **Epic Games Store** for the DLCs of the games you select. All of that information lands in one simple interface for installing, configuring and removing DLC unlockers.
+
+The main job is to **generate and install DLC unlocker configs automatically** for whichever games and DLCs you choose. Right-click any entry for more:
+
+| 🖱️ Right-click action | What happens |
+|---|---|
+| 🔧 **Repair** | Repairs the Paradox Launcher |
+| 📝 **Open appinfo** | Opens parsed Steam / Epic appinfo in Notepad(++) |
+| 🔄 **Refresh** | Re-queries Steam / Epic appinfo |
+| 📂 **Open folders** | Opens the root game directory and important DLL directories in Explorer |
+| 🌐 **Open links** | SteamDB, ScreamDB, Steam Store, Epic Games Store, Steam Community, Ubisoft Store and official game websites |
 
 ---
 
-<img width="955" height="663" alt="image" src="https://github.com/user-attachments/assets/f91c4ee4-6145-4e9e-a638-acbf0ddae052" />
+## ⚡ Act II — The Arsenal
 
+<table>
+<tr>
+<td width="50%" valign="top">
 
-### 🛡️ Antivirus / False Positive Warning
+### 🧠 Smart discovery
+- Scans **Steam**, **Epic Games**, **Heroic** and **Ubisoft Connect** libraries
+- Downloads and installs **SteamCMD** by itself when a Steam game is selected
+- Gathers and caches appinfo (name, buildid, listofdlc, depots…) for **every** DLC
 
-> ⚠️ **As is widely known, all software that modifies or interacts with DLL files may be flagged as a virus by antivirus programs.**
+</td>
+<td width="50%" valign="top">
 
-VirusTotal scan results and antivirus software **may detect this project as malicious**. However:
+### 🛠️ One-click install & revert
+- Installs DLLs and generates configs for **SmokeAPI**, **CreamAPI**, **ScreamAPI**, **Uplay R1** & **Uplay R2** Unlockers, optionally through **Koaloader**
+- Cleanly **uninstalls** all of the above
+- Repairs the **Paradox Launcher** automatically after launcher updates
 
-- The **entire project is open source** — no encrypted or obfuscated code is included.
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+### 🎨 Comfort features
+- 🌙 **Dark mode**
+- 🔤 Sort the game list by name
+- 🛡️ Block protected games
+- 🧹 Clear the cache and reconfigure SteamCMD from **Settings**
+
+</td>
+<td width="50%" valign="top">
+
+### 🧪 For tinkerers
+- **Test Game Generator** for Steam / Epic / Ubisoft App IDs
+- Debug log window
+- Unlocker DLLs are embedded in the binary, so **nothing else needs to be downloaded**
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🎥 Act III — Lights, Camera, Install
+
+### 📦 Installation
+
+```text
+1. Download   →  CreamInstaller.zip from the latest release
+2. Extract    →  CreamInstaller.exe, anywhere you like (single-file executable)
+3. Run        →  that's it
+```
+
+<div align="center">
+
+[![Download](https://img.shields.io/badge/⬇%20Download-Latest%20Release-ff8a00?style=for-the-badge&logo=github)](https://github.com/ubden/CreamApi-CreamInstaller/releases/latest)
+[![.NET Runtime](https://img.shields.io/badge/Requires-.NET%209%20Desktop%20Runtime%20(x64)-512BD4?style=for-the-badge&logo=dotnet)](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)
+
+</div>
+
+> [!IMPORTANT]
+> CreamInstaller ships as a single executable, but it **depends on the [.NET 9 Desktop Runtime (x64)](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)**. If the program doesn't launch, install that runtime first.
+
+### 🎬 Usage: the scene-by-scene script
+
+| Scene | Action |
+|:---:|---|
+| **1** | Launch `CreamInstaller.exe`. *(See above if it doesn't start.)* |
+| **2** | Choose which programs and games to scan. *All installed Steam, Epic and Ubisoft games are detected automatically.* |
+| **3** | If you picked a Steam game, wait while SteamCMD is downloaded and installed. *Usually quick; depends on your connection.* |
+| **4** | Wait while game info and DLCs are gathered and cached. *The first run can take a while if you selected many games with many DLCs.* |
+| **5** | **CAREFULLY** select the games and DLCs you want to unlock. *No unlocker has been tested on every game.* |
+| **6** | Decide whether to use **Koaloader**, and if so, choose a proxy DLL. *If the default `version.dll` doesn't work, see the [forum thread](https://forum.ubden.com.tr/konu/creaminstaller-auto-dlc-unlocker-installer-config-gen.1602/).* |
+| **7** | Click **Generate and Install**. 🎉 |
+| **8** | Click **OK** to close the program. |
+| **↩️** | If an unlocker causes trouble, return to scene 5, select the games to revert, and click **Uninstall Selected**. |
+
+> [!NOTE]
+> CreamInstaller does **not** download or install actual DLC content. It installs DLC *unlockers* only. If a game doesn't already ship with its DLC files (many don't), you'll need to get them yourself. The relevant cs.rin.ru thread for the game is usually the best place to look.
+
+---
+
+## 🧰 Act IV — Behind the Scenes
+
+<details>
+<summary><b>🏗️ Building from source</b></summary>
+
+<br/>
+
+**Requirements**
+- [.NET 9 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) or later (SDK 10.x also works: `global.json` uses `rollForward: latestMajor`)
+- Visual Studio 2022+ with the *.NET desktop development* workload, **or** VS Code with the C# extension
+
+```bash
+git clone https://github.com/ubden/CreamApi-CreamInstaller.git
+cd CreamApi-CreamInstaller
+dotnet build CreamInstaller/CreamInstaller.csproj -c Release
+```
+
+**Publishing a single-file build** (the same command the release workflow runs):
+
+```bash
+dotnet publish CreamInstaller/CreamInstaller.csproj -c Release -r win-x64 \
+  --self-contained false -p:PublishSingleFile=true -o publish/
+```
+
+> CreamAPI's `steam_api.dll` / `steam_api64.dll` are **not** distributed in this repository. To embed CreamAPI, place them in `CreamInstaller/Resources/CreamAPI/` before building. Without them the build still succeeds, but the CreamAPI unlocker option is unavailable in that build.
+
+</details>
+
+<details>
+<summary><b>🗺️ Project map</b></summary>
+
+<br/>
+
+```text
+CreamInstaller/
+├── Components/   → Custom WinForms controls (tree view, toggle switch, context menus)
+├── Forms/        → Main, Install, Settings, Update, Debug, Scan & Test Game windows
+├── Platforms/    → Steam (SteamCMD / Store / VDF), Epic (+ Heroic, GraphQL), Ubisoft, Paradox
+├── Resources/    → Unlocker integrations + embedded DLLs (Koaloader, SmokeAPI, ScreamAPI, Uplay R1/R2, CreamAPI)
+└── Utility/      → HTTP, caching, safe I/O, theming, logging, diagnostics
+```
+
+</details>
+
+<details>
+<summary><b>🐛 Bugs, crashes & questions</b></summary>
+
+<br/>
+
+Report bugs and crashes on the [**GitHub Issues**](https://github.com/ubden/CreamApi-CreamInstaller/issues) page for the fastest help.
+
+> [!WARNING]
+> **No official support is provided.** For community help, use:
+> - 💬 [GitHub Discussions](https://github.com/ubden/CreamApi-CreamInstaller/discussions)
+> - 🗣️ [ubden Forum](https://forum.ubden.com.tr/konu/creaminstaller-auto-dlc-unlocker-installer-config-gen.1602/)
+
+Want to contribute? Read the [Contributing Guide](.github/CONTRIBUTING.md) first.
+
+</details>
+
+---
+
+## ⚖️ Act V — The Fine Print
+
+> **This software is an open-source project developed for the community and is not affiliated with any organization or institution.**
+> It is shared purely for **educational purposes**, software development testing, and to help the open-source community grow.
+
+<details open>
+<summary><b>🛡️ Antivirus / false-positive warning</b></summary>
+
+<br/>
+
+> ⚠️ **Software that modifies or interacts with DLL files is commonly flagged by antivirus programs.**
+
+VirusTotal and antivirus software **may detect this project as malicious**. However:
+
+- The **entire project is open source**. There is no encrypted or obfuscated code.
 - It is intended solely for **educational and development purposes**.
-- This software is **for experienced users only**. If you are not comfortable reviewing source code yourself, **downloading and using this software is not recommended**.
+- It is **for experienced users only**. If you aren't comfortable reviewing the source code yourself, **don't download or use this software**.
 
-For further reading on antivirus false positives related to DLL-interacting tools, see:  
-📄 [Springer – *International Journal of Information Security* (2024)](https://link.springer.com/article/10.1007/s10207-024-00836-w)  
+Further reading on antivirus false positives related to DLL-interacting tools:
+📄 [Springer – *International Journal of Information Security* (2024)](https://link.springer.com/article/10.1007/s10207-024-00836-w) ·
 📖 [Wikipedia – Antivirus Software](https://en.wikipedia.org/wiki/Antivirus_software)
 
----
+</details>
 
-### ⚖️ Legal Responsibility
+<details open>
+<summary><b>⚖️ Legal responsibility</b></summary>
+
+<br/>
+
 By using this software, you agree that:
 - **All responsibility lies with you, the user.**
-- The platform and its contributors provide this software **"as is"**, without any warranty of any kind, express or implied.  
-  This includes, but is not limited to, the warranties of **merchantability**, **fitness for a particular purpose**, or **non-infringement**.  
+- The platform and its contributors provide this software **"as is"**, without warranty of any kind, express or implied, including but not limited to the warranties of **merchantability**, **fitness for a particular purpose**, or **non-infringement**.
 
 > ⚠️ **Use it at your own risk.**
 
----
+</details>
 
-### 🎯 Intended Use
-The primary purpose of this project is to:
-- Educate the community by sharing open-source code.
-- Facilitate learning and encourage innovation through open collaboration.
+<details open>
+<summary><b>🎯 Intended use</b></summary>
 
-❌ **This software is not intended for production use.**  
-We strongly recommend purchasing and using professionally licensed software for your needs.
+<br/>
 
+This project exists to:
+- Teach the community by sharing open-source code.
+- Support learning and innovation through open collaboration.
 
----
+❌ **This software is not intended for production use.** We strongly recommend buying properly licensed software for your needs.
 
-### 🚨 Report Abuse
-If you encounter any abuse or misuse of this software, please report it to:  
-📧 **[abuse@ubden.com](mailto:abuse@ubden.com)**
+</details>
 
----
+<details open>
+<summary><b>🚨 Report abuse</b></summary>
 
-> Thank you for being a part of the open-source community! 🌟
+<br/>
 
+If you see this software being abused or misused, report it to 📧 **[abuse@ubden.com](mailto:abuse@ubden.com)**.
+Security vulnerabilities: see the [Security Policy](.github/SECURITY.md).
 
-###### The program utilizes the latest versions of [Koaloader](https://github.com/acidicoala/Koaloader), [SmokeAPI](https://github.com/acidicoala/SmokeAPI), [ScreamAPI](https://github.com/acidicoala/ScreamAPI), [Uplay R1 Unlocker](https://github.com/acidicoala/UplayR1Unlocker) and [Uplay R2 Unlocker](https://github.com/acidicoala/UplayR2Unlocker), all by the wonderful [acidicoala](https://github.com/acidicoala), and all downloaded from the posts above and embedded into the program itself; no further downloads necessary on your part!
----
-#### Description:
-Automatically finds all installed Steam, Epic and Ubisoft games with their respective DLC-related DLL locations on the user's computer,
-parses SteamCMD, Steam Store and Epic Games Store for user-selected games' DLCs, then provides a very simple graphical interface
-utilizing the gathered information for the maintenance of DLC unlockers.
-
-The primary function of the program is to **automatically generate and install DLC unlockers** for whichever
-games and DLCs the user selects; however, through the use of **right-click context menus** the user can also:
-* automatically repair the Paradox Launcher
-* open parsed Steam and/or Epic Games appinfo in Notepad(++)
-* refresh parsed Steam and/or Epic Games appinfo
-* open root game directories and important DLL directories in Explorer
-* open SteamDB, ScreamDB, Steam Store, Epic Games Store, Steam Community, Ubisoft Store, and official game website links (where applicable) in the default browser
-
----
-#### Features:
-* Automatic download and installation of SteamCMD as necessary whenever a Steam game is chosen. *For gathering appinfo such as name, buildid, listofdlc, depots, etc.*
-* Automatic gathering and caching of information for all selected Steam and Epic games and **ALL** of their DLCs.
-* Automatic DLL installation and configuration generation for Koaloader, SmokeAPI, ScreamAPI, Uplay R1 Unlocker and Uplay R2 Unlocker.
-* Automatic uninstallation of DLLs and configurations for Koaloader, CreamAPI, SmokeAPI, ScreamAPI, Uplay R1 Unlocker and Uplay R2 Unlocker.
-* Automatic reparation of the Paradox Launcher (and manually via the right-click context menu "Repair" option). *For when the launcher updates whilst you have CreamAPI, SmokeAPI or ScreamAPI installed to it.*
-
----
-#### Installation:
-1. Download the latest release from [GitHub Releases](https://github.com/ubden/CreamApi-CreamInstaller/releases/latest).
-2. Extract `CreamInstaller.exe` to anywhere on your computer. *It's completely self-contained.*
-
-If the program doesn't launch, install the [.NET 9 Desktop Runtime (x64)](https://dotnet.microsoft.com/en-us/download/dotnet/9.0).
-
----
-#### Building from Source:
-To build the project from source code, you need:
-1. [.NET 9 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) or later (SDK 10.x is also supported)
-2. Visual Studio 2022 (or later) with .NET desktop development workload, or Visual Studio Code with C# extension
-
-**Note:** The application targets .NET 9. The `global.json` file uses `rollForward: latestMajor` for maximum SDK compatibility.
-
----
-#### **NOTE:** This program does not automatically download nor install actual DLC files for you. As the title of the program says, it's only a DLC Unlocker installer. Should the game you wish to unlock DLC for not already come with the DLCs installed (very many do not), you have to find, download, and install those yourself. Preferably, you should be referring to the proper cs.rin.ru post for the game(s) you're tinkering with; you'll usually find any answer to your problems there.
-
----
-#### Usage:
-1. Start the program executable. *Read above under Installation if it doesn't launch.*
-2. Choose which programs and/or games the program should scan for DLC. *The program automatically gathers all installed games from Steam, Epic and Ubisoft directories.*
-3. Wait for the program to download and install SteamCMD (if you chose a Steam game). *Very fast, depends on internet speed.*
-4. Wait for the program to gather and cache the chosen games' information & DLCs. *May take a good amount of time on the first run, depends on how many games you chose and how many DLCs they have.*
-5. **CAREFULLY** select which games' DLCs you wish to unlock. *Obviously none of the DLC unlockers are tested for every single game!*
-6. Choose whether or not to install with Koaloader, and if so then also pick the proxy DLL to use. *If the default version.dll doesn't work, then see [here](https://forum.ubden.com.tr/konu/creaminstaller-auto-dlc-unlocker-installer-config-gen.1602/#google_vignette) to find one that does.*
-7. Click the **Generate and Install** button.
-8. Click the **OK** button to close the program.
-9. If any of the DLC unlockers cause problems with any of the games you installed them on, simply go back to step 5 and select what games you wish you **revert** changes to, and instead click the **Uninstall** button this time.
-
----
-##### Bugs/Crashes/Issues:
-For reliable and quick assistance, all bugs, crashes and other issues should be referred to the [GitHub Issues](https://github.com/ubden/CreamApi-CreamInstaller/issues) page!
-
-> ⚠️ **No official support is provided.** For community help visit:
-> - [GitHub Discussions](https://github.com/ubden/CreamApi-CreamInstaller/discussions)
-> - [ubden Forum](https://forum.ubden.com.tr/konu/creaminstaller-auto-dlc-unlocker-installer-config-gen.1602/)
+</details>
 
 ---
 
+## 🎞️ End Credits
 
+<div align="center">
+
+*Starring the brilliant unlockers by* [**acidicoala**](https://github.com/acidicoala)
+
+[Koaloader](https://github.com/acidicoala/Koaloader) · [SmokeAPI](https://github.com/acidicoala/SmokeAPI) · [ScreamAPI](https://github.com/acidicoala/ScreamAPI) · [Uplay R1 Unlocker](https://github.com/acidicoala/UplayR1Unlocker) · [Uplay R2 Unlocker](https://github.com/acidicoala/UplayR2Unlocker)
+
+*Their latest versions are embedded in the program, so you don't need to download anything else.*
+
+<br/>
+
+*With thanks to everyone who has ever opened an issue, sent a PR, or helped someone on the forum.*
+
+<a href="https://github.com/ubden/CreamApi-CreamInstaller/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=ubden/CreamApi-CreamInstaller" alt="Contributors" />
+</a>
+
+</div>
+
+---
+
+## 🌟 Post-Credits Scene — Join the Cast
+
+<div align="center">
+
+### *Every hit movie needs a sequel. Every sequel needs a crew.*
+
+This project is built and maintained **for free**, on nights and weekends, for a community of gamers and tinkerers.
+Following, starring and donating keep the next release coming.
+
+<br/>
+
+<table>
+<tr>
+<td align="center" width="33%">
+
+### 👤 Follow
+
+Get notified about new releases and new projects first.
+
+<a href="https://github.com/ubden"><img src="https://img.shields.io/badge/Follow-@ubden-181717?style=for-the-badge&logo=github" alt="Follow @ubden" /></a>
+
+</td>
+<td align="center" width="33%">
+
+### ⭐ Star
+
+It costs nothing and helps others discover the project.
+
+<a href="https://github.com/ubden/CreamApi-CreamInstaller/stargazers"><img src="https://img.shields.io/badge/Star-This%20Repo-f5c518?style=for-the-badge&logo=github&logoColor=black" alt="Star this repo" /></a>
+
+</td>
+<td align="center" width="33%">
+
+### ☕ Donate
+
+Every donation turns into more updates, fixes and supported games.
+
+<a href="https://ubd.one/donate"><img src="https://img.shields.io/badge/Donate-Support%20Us-ff5f5f?style=for-the-badge&logo=paypal&logoColor=white" alt="Donate" /></a>
+
+</td>
+</tr>
+</table>
+
+<br/>
+
+**More ways to support:**
+
+<a href="https://github.com/sponsors/ubden"><img src="https://img.shields.io/badge/GitHub%20Sponsors-EA4AAA?style=flat-square&logo=githubsponsors&logoColor=white" alt="GitHub Sponsors" /></a>
+<a href="https://buymeacoffee.com/ubden"><img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=flat-square&logo=buymeacoffee&logoColor=black" alt="Buy Me a Coffee" /></a>
+<a href="https://ko-fi.com/ubden"><img src="https://img.shields.io/badge/Ko--fi-FF5E5B?style=flat-square&logo=kofi&logoColor=white" alt="Ko-fi" /></a>
+<a href="https://www.patreon.com/ubden"><img src="https://img.shields.io/badge/Patreon-F96854?style=flat-square&logo=patreon&logoColor=white" alt="Patreon" /></a>
+<a href="https://opencollective.com/ubden"><img src="https://img.shields.io/badge/Open%20Collective-7FADF2?style=flat-square&logo=opencollective&logoColor=white" alt="Open Collective" /></a>
+<a href="https://liberapay.com/ubden"><img src="https://img.shields.io/badge/Liberapay-F6C915?style=flat-square&logo=liberapay&logoColor=black" alt="Liberapay" /></a>
+
+<br/><br/>
+
+### 📈 The story so far
+
+<a href="https://star-history.com/#ubden/CreamApi-CreamInstaller&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=ubden/CreamApi-CreamInstaller&type=Date&theme=dark" />
+    <img src="https://api.star-history.com/svg?repos=ubden/CreamApi-CreamInstaller&type=Date" width="640" alt="Star History" />
+  </picture>
+</a>
+
+<br/><br/>
+
+> *"The end? No. This is only the beginning."* 🎬
+> **Thank you for being part of the open-source community.** 🌟
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:ff8a00,50:302b63,100:0f0c29&height=120&section=footer" width="100%" alt="" />
+
+</div>

@@ -47,6 +47,9 @@ internal static class Resources
     internal static void WriteManifestResource(this string resourceIdentifier, string filePath)
     {
         ProgramData.Log.Info($"[Resources] Writing manifest resource: {resourceIdentifier} -> {filePath}", LogDestination.Scan);
+        // Never create an empty file in place of a missing resource; that would leave the game with a broken DLL.
+        if (!EmbeddedResources.Contains(resourceIdentifier))
+            throw new CustomMessageException($"The embedded resource {resourceIdentifier} is not included in this build.");
         while (!Program.Canceled)
             try
             {
